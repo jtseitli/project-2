@@ -1,17 +1,20 @@
+"use client"; 
 
+import { useState, useEffect } from "react";
 
-export const metadata = {
-  title: "Home | Profile Directory",
-  description: "Browse and explore user profiles.",
-};
+export default function Home() {
+  const [profiles, setProfiles] = useState([]);
+  const [filter, setFilter] = useState("");
 
+  useEffect(() => {
+    fetch("https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php")
+      .then((res) => res.json())
+      .then((data) => setProfiles(data));
+  }, []);
 
-export default async function Home() {
-  const res = await fetch(
-    "https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php",
-    { cache: "no-store" }
+  const filteredProfiles = profiles.filter((p) =>
+    p.name.toLowerCase().includes(filter.toLowerCase())
   );
-  const profiles = await res.json();
 
   return (
     <main style={{ padding: "2rem" }}>
@@ -23,6 +26,8 @@ export default async function Home() {
           type="text"
           placeholder="Start typing..."
           style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
         />
       </div>
 
@@ -33,7 +38,7 @@ export default async function Home() {
           gap: "1rem",
         }}
       >
-        {profiles.map((profile) => (
+        {filteredProfiles.map((profile) => (
           <a
             key={profile.id}
             href={`/profiles/${profile.id}`}
