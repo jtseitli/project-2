@@ -1,5 +1,5 @@
 export default async function ProfilePage({ params }) {
-    // If params is a Promise, await it
+
     const resolvedParams = await params;
   
     const res = await fetch(
@@ -8,11 +8,11 @@ export default async function ProfilePage({ params }) {
     );
     const profiles = await res.json();
   
-    // Debug logs
+
     console.log("Params ID:", resolvedParams.id);
     console.log("Profile IDs:", profiles.map(p => p.id));
   
-    // Find the matching profile
+
     const profile = profiles.find(
       (p) => String(p.id).trim() === String(resolvedParams.id).trim()
     );
