@@ -1,76 +1,75 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [profiles, setProfiles] = useState([]);
   const [filter, setFilter] = useState("");
+  const router = useRouter();
 
+  // Load all profiles
   useEffect(() => {
-    fetch("https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php")
+    fetch("/api/profiles")
       .then((res) => res.json())
-      .then((data) => setProfiles(data));
+      .then((data) => setProfiles(data))
+      .catch((err) => console.error("Failed to load profiles:", err));
   }, []);
+
+  // Delete profile
+  async function handleDelete(id) {
+    if (!confirm("Are you sure you want to delete this profile?")) return;
+
+    const res = await fetch(`/api/profiles?id=${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setProfiles((prev) => prev.filter((p) => p.id !== id));
+    } else {
+      alert("Failed to delete profile");
+    }
+  }
 
   const filteredProfiles = profiles.filter((p) =>
     p.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>Profiles</h1>
-      <div style={{ margin: "1rem 0" }}>
-        <label htmlFor="filter">Filter by name:</label>
+    <main className="container">
+      <h1 className="page-title">Profiles</h1>
+
+      <div className="actions">
+        <a href="/add-profile" className="add-btn">
+          + Add Profile
+        </a>
         <input
-          id="filter"
           type="text"
-          placeholder="Start typing..."
-          style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
+          placeholder="Filter by name..."
+          className="filter-input"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          gap: "1rem",
-        }}
-      >
-        {filteredProfiles.map((profile) => (
-          <a
-            key={profile.id}
-            href={`/profiles/${profile.id}`}
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              border: "1px solid #ddd",
-              borderRadius: "12px",
-              padding: "1rem",
-              textAlign: "center",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              transition: "transform 0.2s",
-            }}
-          >
-            <img
-              src={profile.image_url}
-              alt={profile.name}
-              style={{
-                width: "100%",
-                height: "150px",
-                objectFit: "cover",
-                borderRadius: "8px",
-                marginBottom: "0.5rem",
-              }}
-            />
-            <h2 style={{ fontSize: "1.1rem", margin: "0.25rem 0" }}>
-              {profile.name}
-            </h2>
-            <p style={{ fontSize: "0.9rem", color: "#555" }}>{profile.title}</p>
-          </a>
-        ))}
-      </div>
+      {filteredProfiles.length === 0 ? (
+        <p className="empty-text">No profiles found.</p>
+      ) : (
+        <div className="grid">
+          {filteredProfiles.map((profile) => (
+            <div key={profile.id} className="card">
+              <h2 className="profile-name">{profile.name}</h2>
+              <p>Major: {profile.major}</p>
+              <p>Year: {profile.year}</p>
+              <p>GPA: {profile.gpa}</p>
+
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(profile.id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
