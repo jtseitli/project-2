@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 const prisma = new PrismaClient();
 
-// GET: Retrieve profiles from Neon
+//Get
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -31,7 +31,7 @@ export async function GET(request) {
   }
 }
 
-// POST: Add a new profile
+//Post
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -57,7 +57,7 @@ export async function POST(request) {
   }
 }
 
-// DELETE: Remove a profile by id
+//Delete
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -73,7 +73,7 @@ export async function DELETE(request) {
   }
 }
 
-// PATCH: Update an existing profile
+//Patch
 export async function PATCH(request) {
   try {
     const body = await request.json();
