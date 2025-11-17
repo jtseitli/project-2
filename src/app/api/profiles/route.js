@@ -5,10 +5,18 @@ export const dynamic = "force-dynamic";
 
 const prisma = new PrismaClient();
 
-//Get
+
+// GET
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
+    const idParam = searchParams.get("id");
+
+    if (idParam) {
+      const id = Number(idParam);
+      const profile = await prisma.profile.findUnique({ where: { id } });
+      return Response.json(profile ? [profile] : [], { status: 200 });
+    }
 
     const filters = {};
     const major = searchParams.get("major");
@@ -31,20 +39,12 @@ export async function GET(request) {
   }
 }
 
-//Post
+
+// POST
 export async function POST(request) {
   try {
     const body = await request.json();
     const { name, major, year, gpa } = body;
-
-    if (
-      typeof name !== "string" ||
-      typeof major !== "string" ||
-      typeof year !== "number" || year < 1 || year > 4 ||
-      typeof gpa !== "number" || gpa < 0 || gpa > 4
-    ) {
-      return Response.json({ error: "Invalid input fields" }, { status: 400 });
-    }
 
     const newProfile = await prisma.profile.create({
       data: { name, major, year, gpa },
@@ -57,37 +57,37 @@ export async function POST(request) {
   }
 }
 
-//Delete
+
+// DELETE
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = Number(searchParams.get("id"));
-    if (!id) return Response.json({ error: "Missing id" }, { status: 400 });
-
     await prisma.profile.delete({ where: { id } });
 
-    return Response.json({ message: `Profile ${id} deleted` }, { status: 200 });
+    return Response.json({ message: "Deleted" }, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return Response.json({ error: "Profile not found or delete failed" }, { status: 404 });
+    return Response.json({ error: "Delete failed" }, { status: 500 });
   }
 }
 
-//Patch
+
+// PATCH
 export async function PATCH(request) {
   try {
     const body = await request.json();
-    const { id, ...updates } = body;
-    if (!id) return Response.json({ error: "Missing id" }, { status: 400 });
+    console.log("PATCH RECEIVED BODY:", body);
 
+    const { id, ...updates } = body;
     const updated = await prisma.profile.update({
       where: { id },
       data: updates,
     });
 
+    console.log("UPDATED RESULT:", updated);
     return Response.json(updated, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error("PATCH ERROR:", error);
     return Response.json({ error: "Update failed" }, { status: 500 });
   }
 }

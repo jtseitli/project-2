@@ -54,7 +54,11 @@ export default function Home() {
       ) : (
         <div className="grid">
           {filteredProfiles.map((profile) => (
-            <div key={profile.id} className="card">
+            <div
+              key={profile.id}
+              className="card"
+              onClick={() => router.push(`/profiles/${profile.id}`)}
+            >
               <h2 className="profile-name">{profile.name}</h2>
               <p>Major: {profile.major}</p>
               <p>Year: {profile.year}</p>
@@ -62,7 +66,9 @@ export default function Home() {
 
               <button
                 className="delete-btn"
-                onClick={() => handleDelete(profile.id)}
+                onClick={(e) => {
+                  handleDelete(profile.id);
+                }}
               >
                 Delete
               </button>
