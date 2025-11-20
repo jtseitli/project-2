@@ -1,0 +1,86 @@
+/* Container */
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 350px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fafafa;
+  }
+  
+  .title {
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+  
+
+
+  .authForm label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+  
+  .authForm input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+
+  .authForm button {
+    padding: 0.7rem;
+    border: none;
+    background: #0070f3;
+    color: white;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .authForm button:disabled {
+    background: #8bb7f0;
+    cursor: not-allowed;
+  }
+  
+
+  .error {
+    color: #d8000c;
+    background: #ffd2d2;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+
+  .statusMessage {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+
+  .toggle {
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+  
+  .toggle button {
+    margin-top: 0.1rem;
+    background: transparent;
+    border: none;
+    color: #0070f3;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
