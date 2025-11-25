@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import styles from "./AuthForm.module.css"; //add your stylesheet
+import styles from "./AuthForm.module.css";
 
 const stripTags = (s) => String(s ?? "").replace(/<\/?[^>]+>/g, "");
 
@@ -27,10 +27,12 @@ const AuthForm = () => {
     setErrors("");
     setData({ email: "", password: "" });
   };
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setData((prev) => ({ ...prev, [id]: value }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors("");
@@ -38,6 +40,7 @@ const AuthForm = () => {
 
     const email = stripTags(data.email);
     const password = stripTags(data.password);
+
     try {
       if (isLogin) {
         const result = await signIn("credentials", {
@@ -46,6 +49,7 @@ const AuthForm = () => {
           email,
           password,
         });
+
         if (result?.error) {
           setErrors(result.error);
         }
@@ -55,22 +59,25 @@ const AuthForm = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
-        const data = await res.json();
-        if (data.error) {
-          setErrors(data.error);
+
+        const resultData = await res.json();
+
+        if (resultData.error) {
+          setErrors(resultData.error);
         } else {
-          const result = await signIn("credentials", {
+          const loginResult = await signIn("credentials", {
             redirect: true,
             callbackUrl,
             email,
             password,
           });
-          if (result?.error) {
-            setErrors(result.error);
+
+          if (loginResult?.error) {
+            setErrors(loginResult.error);
           }
         }
       }
-    } catch (error) {
+    } catch {
       setErrors("An unexpected error occurred. Please try again.");
       return;
     } finally {
@@ -80,9 +87,10 @@ const AuthForm = () => {
 
   return (
     <>
-    <h1 className={styles.title}>{isLogin ? "Sign In" : "Register"}</h1>
-    {statusMessage && <p className={styles.statusMessage}>{statusMessage}</p>}
-    <form onSubmit={handleSubmit} className={styles.authForm}>
+      <h1 className={styles.title}>{isLogin ? "Sign In" : "Register"}</h1>
+      {statusMessage && <p className={styles.statusMessage}>{statusMessage}</p>}
+
+      <form onSubmit={handleSubmit} className={styles.authForm}>
         <div>
           <label htmlFor="email">Email</label>
           <input
@@ -93,6 +101,7 @@ const AuthForm = () => {
             required
           />
         </div>
+
         <div>
           <label htmlFor="password">Password</label>
           <input
@@ -103,11 +112,30 @@ const AuthForm = () => {
             required
           />
         </div>
+
         {errors && <p className={styles.error}>{errors}</p>}
+
         <button type="submit" disabled={isSubmitting || !data.email || !data.password}>
           {isSubmitting ? "Signing in..." : isLogin ? "Sign In" : "Register"}
         </button>
+
+        <button
+          type="button"
+          className={styles.oauthButton}
+          onClick={() => signIn("github", { callbackUrl })}
+        >
+          Sign in with GitHub
+        </button>
+
+        <button
+          type="button"
+          className={styles.oauthButton}
+          onClick={() => signIn("google", { callbackUrl })}
+        >
+          Sign in with Google
+        </button>
       </form>
+
       <div className={styles.toggle}>
         <p>{isLogin ? "Don't have an account?" : "Already have an account?"}</p>
         <button type="button" onClick={handleToggle}>

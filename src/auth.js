@@ -2,10 +2,12 @@ import NextAuth from "next-auth";
 import bcrypt from "bcryptjs";
 import Credentials from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 
 export const {
-  auth,     // for server components & middleware
-  handlers, // for route handlers (GET, POST)
+  auth,
+  handlers,
 } = NextAuth({
   providers: [
     Credentials({
@@ -25,24 +27,31 @@ export const {
           });
 
           if (!user) {
-            console.log("No user found for:", credentials.email);
             return null;
           }
 
           const isValid = await bcrypt.compare(credentials.password, user.password);
 
           if (!isValid) {
-            console.log("Invalid password for:", credentials.email);
             return null;
           }
 
           return user;
 
-        } catch (error) {
-          console.error("Authorization error:", error);
+        } catch {
           return null;
         }
       },
+    }),
+
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+    }),
+
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   ],
 
@@ -54,15 +63,12 @@ export const {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = auth && auth.user;
       const path = nextUrl.pathname;
-
       const isProtectedRoute =
         path.startsWith("/add-profile") ||
         (path.startsWith("/profile/") && path.endsWith("/edit"));
-
       if (isProtectedRoute && !isLoggedIn) {
-        return false; // redirect to sign-in
+        return false;
       }
-
       return true;
     },
 
